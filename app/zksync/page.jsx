@@ -189,6 +189,7 @@ const App = () => {
                         onChange: setSelectedRowKeys,
                     }}
                     toolBarRender={() => [
+                        <Button key="clear" type="primary" onClick={() => setData([])}>创建随机任务</Button>,
                         progress > 0 && <Text key="progress" type="secondary">进度: {progress.toFixed(2)}%</Text>,
                         <Button key="addAddress" type="primary" onClick={() => setIsModalVisible(true)}>
                             添加地址
