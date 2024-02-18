@@ -32,13 +32,6 @@ const App = () => {
             search: true,
         },
         {
-            title: '备注',
-            dataIndex: 'note',
-            key: 'note',
-            render: (text) => <Text strong>{text}</Text>,
-            ellipsis: true,
-        },
-        {
             title: '主网',
             dataIndex: 'mainnet',
             key: 'mainnet',
@@ -114,21 +107,29 @@ const App = () => {
             message.warning('请先选择至少一个地址');
             return;
         }
+
         setLoading(true);
-        const updates = await Promise.all(
-            data.filter(item => selectedRowKeys.includes(item.key)).map(async item => {
-                const updatedData = await getZksyncData(item.address);
-                return {...item, ...updatedData};
-            })
-        );
-        const newData = data.map(item => {
-            const update = updates.find(u => u.key === item.key);
-            return update || item;
-        });
-        setData(newData);
+        for (const key of selectedRowKeys) {
+            console.log(key)
+            const itemIndex = data.findIndex(item => item.key === key);
+            if (itemIndex !== -1) {
+                const item = data[itemIndex];
+                try {
+                    console.log(item.address)
+                    const updatedData = await getZksyncData(item.address);
+                    data[itemIndex] = {...item, ...updatedData, address: item.address};
+                } catch (error) {
+                    console.error("Error updating data for address:", item.address, error);
+                    message.error(`更新地址 ${item.address} 的数据时出错`);
+                }
+            }
+            setData([...data]);
+        }
+
         setLoading(false);
         message.success('选中的地址数据已刷新');
     };
+
 
     useEffect(() => {
         const storedData = localStorage.getItem('zksyncData');
@@ -168,11 +169,10 @@ const App = () => {
     const handleDelete = (key) => {
         const newData = data.filter(item => item.key !== key);
         setData(newData);
-        message.success('地址已删除');
     }
     return (
         <>
-            <Spin spinning={loading} tip="加载中...">
+            <Spin spinning={loading} tip={`正在获取数据... `}>
                 <ProTable
                     columns={columns}
                     dataSource={data}
@@ -189,6 +189,7 @@ const App = () => {
                         onChange: setSelectedRowKeys,
                     }}
                     toolBarRender={() => [
+                        progress > 0 && <Text key="progress" type="secondary">进度: {progress.toFixed(2)}%</Text>,
                         <Button key="addAddress" type="primary" onClick={() => setIsModalVisible(true)}>
                             添加地址
                         </Button>,

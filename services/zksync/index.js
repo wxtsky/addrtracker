@@ -10,6 +10,7 @@ const getZksyncData = async (address) => {
     const era_tx = transactions.length;
     const era_balance = await getEraBalance(address);
     return {
+        key: address,
         address,
         era_day,
         era_week,
