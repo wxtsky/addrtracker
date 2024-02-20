@@ -1,7 +1,7 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Input, message, Modal, Spin, Typography} from 'antd';
+import {Button, Input, message, Modal, Progress, Spin, Typography} from 'antd';
 import getZksyncData from "@/services/zksync";
 
 const {Text} = Typography;
@@ -32,18 +32,37 @@ const App = () => {
             search: true,
         },
         {
-            title: '主网',
+            title: 'zkSync Lite',
+            dataIndex: 'zksynclite',
+            key: 'zksynclite',
+            children: [
+                {
+                    title: 'ETH',
+                    dataIndex: 'lite_eth',
+                    key: 'lite_eth',
+                    align: 'right',
+                },
+                {
+                    title: 'TX',
+                    dataIndex: 'lite_tx',
+                    key: 'lite_tx',
+                    align: 'right',
+                },
+            ],
+        },
+        {
+            title: 'ETH Mainnet',
             dataIndex: 'mainnet',
             key: 'mainnet',
             children: [
                 {
-                    title: '余额(E)',
+                    title: 'ETH',
                     dataIndex: 'mainnet_balance',
                     key: 'mainnet_balance',
                     align: 'right',
                 },
                 {
-                    title: 'TX数量',
+                    title: 'TX',
                     dataIndex: 'mainnet_tx',
                     key: 'mainnet_tx',
                     align: 'right',
@@ -56,7 +75,7 @@ const App = () => {
             key: 'zksyncera',
             children: [
                 {
-                    title: '余额(E)',
+                    title: 'ETH',
                     dataIndex: 'era_balance',
                     key: 'era_balance',
                     align: 'right',
@@ -68,22 +87,29 @@ const App = () => {
                     align: 'right',
                 },
                 {
-                    title: '日活',
+                    title: '日',
                     dataIndex: 'era_day',
                     key: 'era_day',
                     align: 'right',
                 },
                 {
-                    title: '周活',
+                    title: '周',
                     dataIndex: 'era_week',
                     key: 'era_week',
                     align: 'right',
                 },
                 {
-                    title: '月活',
+                    title: '月',
                     dataIndex: 'era_month',
                     key: 'era_month',
                     align: 'right',
+                },
+                {
+                    title: '最后交易',
+                    dataIndex: 'era_last_tx',
+                    key: 'era_last_tx',
+                    align: 'right',
+                    width: 90,
                 },
                 {
                     title: 'VOL(E)',
@@ -91,17 +117,25 @@ const App = () => {
                     key: 'era_vol',
                     align: 'right',
                 },
+                {
+                    title: 'Gas(E)',
+                    dataIndex: 'era_gas',
+                    key: 'era_gas',
+                    align: 'right',
+                }
             ],
         },
         {
             title: '操作',
             dataIndex: 'operation',
             key: 'operation',
+            align: 'center',
             render: (_, record) => (
                 <Button type="link" onClick={() => handleDelete(record.key)}>删除</Button>
             ),
         }
     ];
+
     const refreshSelectedData = async () => {
         if (selectedRowKeys.length === 0) {
             message.warning('请先选择至少一个地址');
@@ -117,6 +151,7 @@ const App = () => {
                 try {
                     console.log(item.address)
                     const updatedData = await getZksyncData(item.address);
+                    console.log(updatedData)
                     data[itemIndex] = {...item, ...updatedData, address: item.address};
                 } catch (error) {
                     console.error("Error updating data for address:", item.address, error);
@@ -127,10 +162,42 @@ const App = () => {
         }
 
         setLoading(false);
+        setSelectedRowKeys([]); // 清空选择
         message.success('选中的地址数据已刷新');
     };
 
-
+    const refreshAllData = async () => {
+        setLoading(true);
+        const total = data.length;
+        let count = 0;
+        for (const item of data) {
+            try {
+                const updatedData = await getZksyncData(item.address);
+                const index = data.findIndex(x => x.address === item.address);
+                if (index !== -1) {
+                    data[index] = {...data[index], ...updatedData};
+                }
+                count++;
+                setProgress((count / total) * 100);
+            } catch (error) {
+                console.error("Error updating data for address:", item.address, error);
+            }
+        }
+        setData([...data]);
+        setLoading(false);
+        setSelectedRowKeys([]); // 清空选择
+        message.success('所有地址的数据已刷新');
+    };
+    const handleDeleteSelected = () => {
+        if (selectedRowKeys.length === 0) {
+            message.warning('请先选择至少一个地址');
+            return;
+        }
+        const newData = data.filter(item => !selectedRowKeys.includes(item.key));
+        setData(newData);
+        setSelectedRowKeys([]); // 清空选择
+        message.success('选中的地址已删除');
+    };
     useEffect(() => {
         const storedData = localStorage.getItem('zksyncData');
         if (storedData) {
@@ -172,6 +239,7 @@ const App = () => {
     }
     return (
         <>
+            {loading && <Progress percent={Math.round(progress)}/>}
             <Spin spinning={loading} tip={`正在获取数据... `}>
                 <ProTable
                     columns={columns}
@@ -189,15 +257,16 @@ const App = () => {
                         onChange: setSelectedRowKeys,
                     }}
                     toolBarRender={() => [
-                        <Button key="clear" type="primary" onClick={() => setData([])}>创建随机任务</Button>,
-                        progress > 0 && <Text key="progress" type="secondary">进度: {progress.toFixed(2)}%</Text>,
-                        <Button key="addAddress" type="primary" onClick={() => setIsModalVisible(true)}>
+                        <Button key="addAddress" onClick={() => setIsModalVisible(true)}>
                             添加地址
                         </Button>,
-                        <Button key="refreshSelected" type="default" onClick={refreshSelectedData}
-                                disabled={selectedRowKeys.length === 0}>
+                        <Button key="refreshSelected" type="default" onClick={refreshSelectedData}>
                             刷新选中行数据
                         </Button>,
+                        <Button key="refreshAll" onClick={refreshAllData}>
+                            批量刷新所有数据
+                        </Button>,
+                        <Button key="deleteSelected" onClick={handleDeleteSelected}>删除选中地址</Button>,
                     ]}
                 />
             </Spin>
