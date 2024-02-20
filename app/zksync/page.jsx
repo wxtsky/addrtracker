@@ -41,12 +41,14 @@ const App = () => {
                     dataIndex: 'lite_eth',
                     key: 'lite_eth',
                     align: 'right',
+                    sorter: (a, b) => a.lite_eth - b.lite_eth,
                 },
                 {
                     title: 'TX',
                     dataIndex: 'lite_tx',
                     key: 'lite_tx',
                     align: 'right',
+                    sorter: (a, b) => a.lite_tx - b.lite_tx,
                 },
             ],
         },
@@ -60,12 +62,14 @@ const App = () => {
                     dataIndex: 'mainnet_balance',
                     key: 'mainnet_balance',
                     align: 'right',
+                    sorter: (a, b) => a.mainnet_balance - b.mainnet_balance,
                 },
                 {
                     title: 'TX',
                     dataIndex: 'mainnet_tx',
                     key: 'mainnet_tx',
                     align: 'right',
+                    sorter: (a, b) => a.mainnet_tx - b.mainnet_tx,
                 },
             ],
         },
@@ -79,30 +83,35 @@ const App = () => {
                     dataIndex: 'era_balance',
                     key: 'era_balance',
                     align: 'right',
+                    sorter: (a, b) => a.era_balance - b.era_balance,
                 },
                 {
                     title: 'TX',
                     dataIndex: 'era_tx',
                     key: 'era_tx',
                     align: 'right',
+                    sorter: (a, b) => a.era_tx - b.era_tx,
                 },
                 {
                     title: '日',
                     dataIndex: 'era_day',
                     key: 'era_day',
                     align: 'right',
+                    sorter: (a, b) => a.era_day - b.era_day,
                 },
                 {
                     title: '周',
                     dataIndex: 'era_week',
                     key: 'era_week',
                     align: 'right',
+                    sorter: (a, b) => a.era_week - b.era_week,
                 },
                 {
                     title: '月',
                     dataIndex: 'era_month',
                     key: 'era_month',
                     align: 'right',
+                    sorter: (a, b) => a.era_month - b.era_month,
                 },
                 {
                     title: '最后交易',
@@ -116,12 +125,14 @@ const App = () => {
                     dataIndex: 'era_vol',
                     key: 'era_vol',
                     align: 'right',
+                    sorter: (a, b) => a.era_vol - b.era_vol,
                 },
                 {
                     title: 'Gas(E)',
                     dataIndex: 'era_gas',
                     key: 'era_gas',
                     align: 'right',
+                    sorter: (a, b) => a.era_gas - b.era_gas,
                 }
             ],
         },
@@ -246,6 +257,7 @@ const App = () => {
                     dataSource={data}
                     rowKey="address"
                     bordered
+                    ghost={true}
                     pagination={{
                         showQuickJumper: true,
                     }}
@@ -257,6 +269,7 @@ const App = () => {
                         onChange: setSelectedRowKeys,
                     }}
                     toolBarRender={() => [
+                        <Button key="back" type={'link'} onClick={() => window.location.href = '/'}>返回首页</Button>,
                         <Button key="addAddress" onClick={() => setIsModalVisible(true)}>
                             添加地址
                         </Button>,
