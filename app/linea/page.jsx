@@ -150,6 +150,7 @@ const App = () => {
     const fetchData = async () => {
         setIsModalVisible(false);
         setLoading(true);
+        setProgress(0);
         const uniqueAddresses = Array.from(new Set(addresses.split(/[\s,]+/).filter(Boolean)));
         const chunks = chunkArray([...uniqueAddresses], 5);
 
@@ -185,6 +186,7 @@ const App = () => {
         }
 
         setLoading(true);
+        setProgress(0);
         const chunks = chunkArray([...selectedRowKeys], 5);
 
         for (const chunk of chunks) {

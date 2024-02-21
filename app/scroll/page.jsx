@@ -142,6 +142,7 @@ const App = () => {
     const fetchData = async () => {
         setIsModalVisible(false);
         setLoading(true);
+        setProgress(0);
         const uniqueAddresses = Array.from(new Set(addresses.split(/[\s,]+/).filter(Boolean)));
         const chunks = chunkArray([...uniqueAddresses], 5); // 每批处理5个地址
 
@@ -175,8 +176,8 @@ const App = () => {
             message.warning('请先选择至少一个地址');
             return;
         }
-
         setLoading(true);
+        setProgress(0);
         const chunks = chunkArray([...selectedRowKeys], 5); // 每批处理5个地址
 
         for (const chunk of chunks) {
