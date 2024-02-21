@@ -179,7 +179,7 @@ const App = () => {
 
         setLoading(true);
         setProgress(0);
-        const chunks = chunkArray([...selectedRowKeys], 5); // 每批处理5个地址
+        const chunks = chunkArray([...selectedRowKeys], 5);
 
         for (const chunk of chunks) {
             await Promise.all(

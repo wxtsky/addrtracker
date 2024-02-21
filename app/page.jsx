@@ -11,7 +11,7 @@ export default function Home() {
     return (
         <Layout className="layout" style={{minHeight: '100vh'}}>
             <Content style={{
-                padding: '0',
+                padding: '50px 0',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -20,9 +20,7 @@ export default function Home() {
             }}>
                 <div className="site-layout-content" style={{maxWidth: '600px', textAlign: 'center', width: '100%'}}>
                     <h1>欢迎来到区块链交互查询网站</h1>
-                    <h2>
-                        持续优化中...
-                    </h2>
+                    <h2>持续优化中...</h2>
                     <p>请选择下方按钮进行导航</p>
                     <Button
                         type="primary"
@@ -52,10 +50,15 @@ export default function Home() {
                     >
                         Scroll
                     </Button>
+                    <Button type="ghost"
+                            onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}
+                            style={{margin: '10px 8px'}}>
+                        GitHub
+                    </Button>
                 </div>
             </Content>
             <Footer style={{textAlign: 'center', position: 'sticky', bottom: 0, width: '100%'}}>
-                Addr Tracker ©2024
+                AddrTracker ©2024
             </Footer>
         </Layout>
     );
