@@ -27,7 +27,7 @@ const getZksyncData = async (address) => {
         lite_eth,
         lite_tx,
         mainnet_balance,
-        mainnet_tx
+        mainnet_tx,
     }
 }
 export default getZksyncData;

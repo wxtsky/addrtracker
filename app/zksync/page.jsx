@@ -1,12 +1,22 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Input, message, Modal, Progress, Spin, Typography} from 'antd';
+import {Button, Input, message, Modal, Progress, Spin} from 'antd';
 import getZksyncData from "@/services/zksync";
 
-const {Text} = Typography;
 const {TextArea} = Input;
+import {saveAs} from 'file-saver';
+import * as XLSX from 'xlsx';
 
+const exportToExcel = (data, fileName) => {
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const excelBuffer = XLSX.write(wb, {bookType: 'xlsx', type: 'array'});
+    const dataBlob = new Blob([excelBuffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'});
+
+    saveAs(dataBlob, fileName + '.xlsx');
+};
 
 const App = () => {
     const [data, setData] = useState([]);
@@ -22,14 +32,14 @@ const App = () => {
             dataIndex: 'index',
             valueType: 'indexBorder',
             width: 48,
-            render: (_, record, index) => <span style={{fontWeight: 'bold', color: 'blue'}}>{index + 1}</span>,
+            render: (_, record, index) => <> {index + 1} </>,
+            align: 'center',
         },
         {
             title: '地址',
             dataIndex: 'address',
             key: 'address',
             width: 350,
-            search: true,
         },
         {
             title: 'zkSync Lite',
@@ -154,16 +164,19 @@ const App = () => {
         }
 
         setLoading(true);
+        const total = selectedRowKeys.length;
+        let count = 0;
+
         for (const key of selectedRowKeys) {
-            console.log(key)
+            setProgress((count / total) * 100);
+
             const itemIndex = data.findIndex(item => item.key === key);
             if (itemIndex !== -1) {
                 const item = data[itemIndex];
                 try {
-                    console.log(item.address)
                     const updatedData = await getZksyncData(item.address);
-                    console.log(updatedData)
                     data[itemIndex] = {...item, ...updatedData, address: item.address};
+                    count++;
                 } catch (error) {
                     console.error("Error updating data for address:", item.address, error);
                     message.error(`更新地址 ${item.address} 的数据时出错`);
@@ -172,33 +185,12 @@ const App = () => {
             setData([...data]);
         }
 
+        setProgress(100);
         setLoading(false);
-        setSelectedRowKeys([]); // 清空选择
+        setSelectedRowKeys([]);
         message.success('选中的地址数据已刷新');
     };
 
-    const refreshAllData = async () => {
-        setLoading(true);
-        const total = data.length;
-        let count = 0;
-        for (const item of data) {
-            try {
-                const updatedData = await getZksyncData(item.address);
-                const index = data.findIndex(x => x.address === item.address);
-                if (index !== -1) {
-                    data[index] = {...data[index], ...updatedData};
-                }
-                count++;
-                setProgress((count / total) * 100);
-            } catch (error) {
-                console.error("Error updating data for address:", item.address, error);
-            }
-        }
-        setData([...data]);
-        setLoading(false);
-        setSelectedRowKeys([]); // 清空选择
-        message.success('所有地址的数据已刷新');
-    };
     const handleDeleteSelected = () => {
         if (selectedRowKeys.length === 0) {
             message.warning('请先选择至少一个地址');
@@ -206,7 +198,7 @@ const App = () => {
         }
         const newData = data.filter(item => !selectedRowKeys.includes(item.key));
         setData(newData);
-        setSelectedRowKeys([]); // 清空选择
+        setSelectedRowKeys([]);
         message.success('选中的地址已删除');
     };
     useEffect(() => {
@@ -269,17 +261,15 @@ const App = () => {
                         onChange: setSelectedRowKeys,
                     }}
                     toolBarRender={() => [
-                        <Button key="back" type={'link'} onClick={() => window.location.href = '/'}>返回首页</Button>,
+                        <Button key="back" type={'link'} onClick={() => window.location.href = '/'}>首页</Button>,
                         <Button key="addAddress" onClick={() => setIsModalVisible(true)}>
                             添加地址
                         </Button>,
                         <Button key="refreshSelected" type="default" onClick={refreshSelectedData}>
                             刷新选中行数据
                         </Button>,
-                        <Button key="refreshAll" onClick={refreshAllData}>
-                            批量刷新所有数据
-                        </Button>,
                         <Button key="deleteSelected" onClick={handleDeleteSelected}>删除选中地址</Button>,
+                        <Button onClick={() => exportToExcel(data, 'zkSyncData')}>导出数据</Button>,
                     ]}
                 />
             </Spin>

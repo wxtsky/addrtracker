@@ -2,7 +2,7 @@ import axios from "axios";
 import {ethers} from "ethers";
 
 const getEthInfo = async function (address) {
-    const rpc = 'https://rpc.ankr.com/eth';
+    const rpc = 'https://cloudflare-eth.com';
     const batchData = [
         {
             jsonrpc: '2.0',
