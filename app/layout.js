@@ -5,8 +5,8 @@ import {AntdRegistry} from "@ant-design/nextjs-registry";
 const inter = Inter({subsets: ["latin"]});
 
 export const metadata = {
-    title: "MyAddressQuery",
-    description: "MyAddressQuery",
+    title: "AddrTracker",
+    description: "AddrTracker",
 };
 
 export default function RootLayout({children}) {
