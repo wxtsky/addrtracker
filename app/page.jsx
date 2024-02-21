@@ -24,18 +24,39 @@ export default function Home() {
                         持续优化中...
                     </h2>
                     <p>请选择下方按钮进行导航</p>
-                    <Button type="primary" onClick={() => router.push('/zksync')} style={{margin: '0 8px'}}>前往
-                        zkSync</Button>
-                    <Button type="primary" onClick={() => router.push('/linea')} style={{margin: '0 8px'}}>前往
-                        Linea</Button>
-                    <Button type="primary" onClick={() => router.push('/linea')} style={{margin: '0 8px'}}>前往
-                        Base</Button>
-                    <Button type="primary" onClick={() => router.push('/linea')} style={{margin: '0 8px'}}>前往
-                        Scroll</Button>
+                    <Button
+                        type="primary"
+                        onClick={() => router.push('/zksync')}
+                        style={{margin: '0 8px'}}
+                    >
+                        zkSync
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={() => router.push('/linea')}
+                        style={{margin: '0 8px'}}
+                    >
+                        Linea
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={() => router.push('/base')}
+                        style={{margin: '0 8px'}}
+                    >
+                        Base
+                    </Button>
+                    <Button
+                        type="primary"
+                        onClick={() => router.push('/scroll')}
+                        style={{margin: '0 8px'}}
+                    >
+                        Scroll
+                    </Button>
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center', position: 'sticky', bottom: 0, width: '100%'}}>Addr Tracker
-                ©2024</Footer>
+            <Footer style={{textAlign: 'center', position: 'sticky', bottom: 0, width: '100%'}}>
+                Addr Tracker ©2024
+            </Footer>
         </Layout>
     );
 }

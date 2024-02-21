@@ -26,11 +26,11 @@ export default function calculateActivity(transactions) {
     });
 
     return {
-        era_day: activity.daily.size,
-        era_week: activity.weekly.size,
-        era_month: activity.monthly.size,
-        era_gas: (Number(totalFee) / 1e18).toFixed(4),
-        era_last_tx: transactions.length > 0 ? timestampToDate(transactions[0].timestamp * 1000) : "N/A"
+        base_day: activity.daily.size,
+        base_week: activity.weekly.size,
+        base_month: activity.monthly.size,
+        base_gas: (Number(totalFee) / 1e18).toFixed(4),
+        base_last_tx: transactions.length > 0 ? timestampToDate(transactions[0].timestamp * 1000) : "N/A"
     };
 }
 

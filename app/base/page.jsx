@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
 import {Button, Input, message, Modal, Progress, Spin} from 'antd';
-import getLineaData from "@/services/linea";
+import getBaseData from "@/services/base";
 
 const {TextArea} = Input;
 import {saveAs} from 'file-saver';
@@ -63,65 +63,65 @@ const App = () => {
             ],
         },
         {
-            title: 'Linea',
-            dataIndex: 'linea',
-            key: 'linea',
+            title: 'Base',
+            dataIndex: 'base',
+            key: 'base',
             children: [
                 {
                     title: 'ETH',
-                    dataIndex: 'linea_balance',
-                    key: 'linea_balance',
+                    dataIndex: 'base_balance',
+                    key: 'base_balance',
                     align: 'right',
-                    sorter: (a, b) => a.linea_balance - b.linea_balance,
+                    sorter: (a, b) => a.base_balance - b.base_balance,
                 },
                 {
                     title: 'TX',
-                    dataIndex: 'linea_tx',
-                    key: 'linea_tx',
+                    dataIndex: 'base_tx',
+                    key: 'base_tx',
                     align: 'right',
-                    sorter: (a, b) => a.linea_tx - b.linea_tx,
+                    sorter: (a, b) => a.base_tx - b.base_tx,
                 },
                 {
                     title: '日',
-                    dataIndex: 'linea_day',
-                    key: 'linea_day',
+                    dataIndex: 'base_day',
+                    key: 'base_day',
                     align: 'right',
-                    sorter: (a, b) => a.linea_day - b.linea_day,
+                    sorter: (a, b) => a.base_day - b.base_day,
                 },
                 {
                     title: '周',
-                    dataIndex: 'linea_week',
-                    key: 'linea_week',
+                    dataIndex: 'base_week',
+                    key: 'base_week',
                     align: 'right',
-                    sorter: (a, b) => a.linea_week - b.linea_week,
+                    sorter: (a, b) => a.base_week - b.base_week,
                 },
                 {
                     title: '月',
-                    dataIndex: 'linea_month',
-                    key: 'linea_month',
+                    dataIndex: 'base_month',
+                    key: 'base_month',
                     align: 'right',
-                    sorter: (a, b) => a.linea_month - b.linea_month,
+                    sorter: (a, b) => a.base_month - b.base_month,
                 },
                 {
                     title: '最后交易',
-                    dataIndex: 'linea_last_tx',
-                    key: 'linea_last_tx',
+                    dataIndex: 'base_last_tx',
+                    key: 'base_last_tx',
                     align: 'right',
                     width: 90,
                 },
                 {
                     title: 'VOL(E)',
-                    dataIndex: 'linea_vol',
-                    key: 'linea_vol',
+                    dataIndex: 'base_vol',
+                    key: 'base_vol',
                     align: 'right',
-                    sorter: (a, b) => a.linea_vol - b.linea_vol,
+                    sorter: (a, b) => a.base_vol - b.base_vol,
                 },
                 {
                     title: 'Gas(E)',
-                    dataIndex: 'linea_gas',
-                    key: 'linea_gas',
+                    dataIndex: 'base_gas',
+                    key: 'base_gas',
                     align: 'right',
-                    sorter: (a, b) => a.linea_gas - b.linea_gas,
+                    sorter: (a, b) => a.base_gas - b.base_gas,
                 }
             ],
         },
@@ -153,7 +153,7 @@ const App = () => {
             if (itemIndex !== -1) {
                 const item = data[itemIndex];
                 try {
-                    const updatedData = await getLineaData(item.address);
+                    const updatedData = await getBaseData(item.address);
                     data[itemIndex] = {...item, ...updatedData, address: item.address};
                     count++;
                 } catch (error) {
@@ -181,7 +181,7 @@ const App = () => {
         message.success('选中的地址已删除');
     };
     useEffect(() => {
-        const storedData = localStorage.getItem('lineaData');
+        const storedData = localStorage.getItem('baseData');
         if (storedData) {
             setData(JSON.parse(storedData));
         }
@@ -190,7 +190,7 @@ const App = () => {
 
     useEffect(() => {
         if (!isInitialLoad) {
-            localStorage.setItem('lineaData', JSON.stringify(data));
+            localStorage.setItem('baseData', JSON.stringify(data));
         }
     }, [data, isInitialLoad]);
     const fetchData = async () => {
@@ -200,7 +200,7 @@ const App = () => {
         const total = uniqueAddresses.size;
         let count = 0;
         for (const address of uniqueAddresses) {
-            const res = await getLineaData(address);
+            const res = await getBaseData(address);
             const index = data.findIndex(item => item.address === address);
             if (index > -1) {
                 data[index] = res;
@@ -248,7 +248,7 @@ const App = () => {
                             刷新选中行数据
                         </Button>,
                         <Button key="deleteSelected" onClick={handleDeleteSelected}>删除选中地址</Button>,
-                        <Button onClick={() => exportToExcel(data, 'LineaData')}>导出数据</Button>,
+                        <Button onClick={() => exportToExcel(data, 'BaseData')}>导出数据</Button>,
                     ]}
                 />
             </Spin>
