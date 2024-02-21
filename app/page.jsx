@@ -34,8 +34,8 @@ export default function Home() {
                         Scroll</Button>
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center', position: 'sticky', bottom: 0, width: '100%'}}>Ant Design ©2018 Created
-                by Ant UED</Footer>
+            <Footer style={{textAlign: 'center', position: 'sticky', bottom: 0, width: '100%'}}>Addr Tracker
+                ©2024</Footer>
         </Layout>
     );
 }
