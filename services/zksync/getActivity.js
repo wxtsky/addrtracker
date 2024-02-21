@@ -6,11 +6,12 @@ function timestampToDate(timestamp) {
     return `${year}/${month}/${day}`;
 }
 
-export default function calculateActivity(transactions) {
+export default function calculateActivity(transactions, address) {
     const activity = {
         daily: new Set(),
         weekly: new Set(),
         monthly: new Set(),
+        contract: new Set()
     };
     let totalFee = 0
     transactions.forEach(transaction => {
@@ -22,7 +23,10 @@ export default function calculateActivity(transactions) {
         activity.daily.add(day);
         activity.weekly.add(week);
         activity.monthly.add(month);
-        totalFee += Number(transaction.fee);
+        if (transaction.method_name !== "0x" && (transaction.from_address).toLowerCase() === address.toLowerCase()) {
+            totalFee += Number(transaction.fee);
+            activity.contract.add(transaction.to_address);
+        }
     });
 
     return {
@@ -30,7 +34,8 @@ export default function calculateActivity(transactions) {
         era_week: activity.weekly.size,
         era_month: activity.monthly.size,
         era_gas: (Number(totalFee) / 1e18).toFixed(4),
-        era_last_tx: transactions.length > 0 ? timestampToDate(transactions[0].timestamp * 1000) : "N/A"
+        era_last_tx: transactions.length > 0 ? timestampToDate(transactions[0].timestamp * 1000) : "N/A",
+        era_contract: activity.contract.size
     };
 }
 

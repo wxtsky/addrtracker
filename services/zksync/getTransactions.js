@@ -18,6 +18,9 @@ export default async function fetchAddressTransactions(address, cursor = null, a
             "value": tx.value ? ethers.utils.formatUnits(tx.value, 18) : 0,
             "fee": tx.fee,
             "timestamp": tx.timestamp,
+            "to_address": tx.to_address,
+            "from_address": tx.from_address,
+            "method_name": tx.method_name,
         }));
         const accumulatedNewList = [...accumulatedList, ...newList];
         if (nextCursor !== null) {

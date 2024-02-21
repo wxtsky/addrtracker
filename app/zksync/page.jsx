@@ -124,6 +124,13 @@ const App = () => {
                     sorter: (a, b) => a.era_month - b.era_month,
                 },
                 {
+                    title: '合约',
+                    dataIndex: 'era_contract',
+                    key: 'era_contract',
+                    align: 'right',
+                    sorter: (a, b) => a.era_contract - b.era_contract,
+                },
+                {
                     title: '最后交易',
                     dataIndex: 'era_last_tx',
                     key: 'era_last_tx',
