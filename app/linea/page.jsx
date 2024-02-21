@@ -122,6 +122,13 @@ const App = () => {
                     key: 'linea_gas',
                     align: 'right',
                     sorter: (a, b) => a.linea_gas - b.linea_gas,
+                },
+                {
+                    title: 'LXP',
+                    dataIndex: 'xp_balance',
+                    key: 'xp_balance',
+                    align: 'right',
+                    sorter: (a, b) => a.xp_balance - b.xp_balance,
                 }
             ],
         },

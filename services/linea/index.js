@@ -9,7 +9,7 @@ const getLineaData = async (address) => {
     const transactions = await fetchAddressTransactions(address);
     const {linea_day, linea_week, linea_month, linea_last_tx, linea_gas} = calculateActivity(transactions);
     const {linea_vol} = getVol(transactions);
-    const {linea_balance, linea_tx} = await getAccountDetails(address);
+    const {linea_balance, linea_tx, xp_balance} = await getAccountDetails(address);
     const {mainnet_balance, mainnet_tx} = await getEthInfo(address);
     return {
         key: address,
@@ -24,6 +24,7 @@ const getLineaData = async (address) => {
         linea_balance,
         mainnet_balance,
         mainnet_tx,
+        xp_balance
     }
 }
 export default getLineaData;
