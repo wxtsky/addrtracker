@@ -7,6 +7,7 @@ import getLineaData from "@/services/linea";
 const {TextArea} = Input;
 import {saveAs} from 'file-saver';
 import * as XLSX from 'xlsx';
+import getZksyncData from "@/services/zksync";
 
 const exportToExcel = (data, fileName) => {
     const ws = XLSX.utils.json_to_sheet(data);
@@ -142,6 +143,40 @@ const App = () => {
             ),
         }
     ];
+    const chunkArray = (arr, size) =>
+        arr.length > size
+            ? [arr.slice(0, size), ...chunkArray(arr.slice(size), size)]
+            : [arr];
+    const fetchData = async () => {
+        setIsModalVisible(false);
+        setLoading(true);
+        const uniqueAddresses = Array.from(new Set(addresses.split(/[\s,]+/).filter(Boolean)));
+        const chunks = chunkArray([...uniqueAddresses], 5);
+
+        for (const chunk of chunks) {
+            await Promise.all(
+                chunk.map(async address => {
+                    try {
+                        const res = await getLineaData(address);
+                        setData(data => {
+                            const index = data.findIndex(item => item.address === address);
+                            if (index > -1) {
+                                return [...data.slice(0, index), res, ...data.slice(index + 1)];
+                            } else {
+                                return [...data, res];
+                            }
+                        });
+                    } catch (error) {
+                        console.error(`Error fetching data for address: ${address}`, error);
+                    }
+                })
+            );
+            setProgress(prevProgress => prevProgress + (chunk.length / uniqueAddresses.length) * 100);
+        }
+
+        setLoading(false);
+        message.success('所有地址的数据已更新');
+    };
 
     const refreshSelectedData = async () => {
         if (selectedRowKeys.length === 0) {
@@ -150,32 +185,67 @@ const App = () => {
         }
 
         setLoading(true);
-        const total = selectedRowKeys.length;
-        let count = 0;
+        const chunks = chunkArray([...selectedRowKeys], 5);
 
-        for (const key of selectedRowKeys) {
-            setProgress((count / total) * 100);
-
-            const itemIndex = data.findIndex(item => item.key === key);
-            if (itemIndex !== -1) {
-                const item = data[itemIndex];
-                try {
-                    const updatedData = await getLineaData(item.address);
-                    data[itemIndex] = {...item, ...updatedData, address: item.address};
-                    count++;
-                } catch (error) {
-                    console.error("Error updating data for address:", item.address, error);
-                    message.error(`更新地址 ${item.address} 的数据时出错`);
-                }
-            }
-            setData([...data]);
+        for (const chunk of chunks) {
+            await Promise.all(
+                chunk.map(async key => {
+                    const itemIndex = data.findIndex(item => item.key === key);
+                    if (itemIndex !== -1) {
+                        try {
+                            const item = data[itemIndex];
+                            const updatedData = await getLineaData(item.address);
+                            setData(prevData => {
+                                prevData[itemIndex] = {...item, ...updatedData, address: item.address};
+                                return [...prevData];
+                            });
+                        } catch (error) {
+                            console.error(`Error updating data for address: ${item.address}`, error);
+                            message.error(`更新地址 ${item.address} 的数据时出错`);
+                        }
+                    }
+                })
+            );
+            setProgress(prevProgress => prevProgress + (chunk.length / selectedRowKeys.length) * 100);
         }
 
-        setProgress(100);
         setLoading(false);
         setSelectedRowKeys([]);
         message.success('选中的地址数据已刷新');
     };
+    // const refreshSelectedData = async () => {
+    //     if (selectedRowKeys.length === 0) {
+    //         message.warning('请先选择至少一个地址');
+    //         return;
+    //     }
+    //
+    //     setLoading(true);
+    //     const total = selectedRowKeys.length;
+    //     let count = 0;
+    //
+    //     for (const key of selectedRowKeys) {
+    //         setProgress((count / total) * 100);
+    //
+    //         const itemIndex = data.findIndex(item => item.key === key);
+    //         if (itemIndex !== -1) {
+    //             const item = data[itemIndex];
+    //             try {
+    //                 const updatedData = await getLineaData(item.address);
+    //                 data[itemIndex] = {...item, ...updatedData, address: item.address};
+    //                 count++;
+    //             } catch (error) {
+    //                 console.error("Error updating data for address:", item.address, error);
+    //                 message.error(`更新地址 ${item.address} 的数据时出错`);
+    //             }
+    //         }
+    //         setData([...data]);
+    //     }
+    //
+    //     setProgress(100);
+    //     setLoading(false);
+    //     setSelectedRowKeys([]);
+    //     message.success('选中的地址数据已刷新');
+    // };
 
     const handleDeleteSelected = () => {
         if (selectedRowKeys.length === 0) {
@@ -200,28 +270,28 @@ const App = () => {
             localStorage.setItem('lineaData', JSON.stringify(data));
         }
     }, [data, isInitialLoad]);
-    const fetchData = async () => {
-        setIsModalVisible(false);
-        setLoading(true);
-        const uniqueAddresses = new Set(addresses.split(/[\s,]+/).filter(Boolean));
-        const total = uniqueAddresses.size;
-        let count = 0;
-        for (const address of uniqueAddresses) {
-            const res = await getLineaData(address);
-            const index = data.findIndex(item => item.address === address);
-            if (index > -1) {
-                data[index] = res;
-            } else {
-                setData(data => [...data, res]);
-            }
-            count += 1;
-            setProgress((count / total) * 100);
-            if (count === total) {
-                setLoading(false);
-                message.success('所有地址的数据已更新');
-            }
-        }
-    };
+    // const fetchData = async () => {
+    //     setIsModalVisible(false);
+    //     setLoading(true);
+    //     const uniqueAddresses = new Set(addresses.split(/[\s,]+/).filter(Boolean));
+    //     const total = uniqueAddresses.size;
+    //     let count = 0;
+    //     for (const address of uniqueAddresses) {
+    //         const res = await getLineaData(address);
+    //         const index = data.findIndex(item => item.address === address);
+    //         if (index > -1) {
+    //             data[index] = res;
+    //         } else {
+    //             setData(data => [...data, res]);
+    //         }
+    //         count += 1;
+    //         setProgress((count / total) * 100);
+    //         if (count === total) {
+    //             setLoading(false);
+    //             message.success('所有地址的数据已更新');
+    //         }
+    //     }
+    // };
     const handleDelete = (key) => {
         const newData = data.filter(item => item.key !== key);
         setData(newData);
