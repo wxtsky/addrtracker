@@ -43,8 +43,8 @@ export default function Home() {
             <Col span={24} lg={12} xl={10}>
                 <Card>
                     <Typography>
-                        <Title level={2} style={{textAlign: 'center'}}>区块链交互查询平台</Title>
-                        <Paragraph style={{textAlign: 'center'}}>持续优化中... 请选择下方按钮进行导航。</Paragraph>
+                        <Title level={2} style={{textAlign: 'center'}}>AddrTracker</Title>
+                        <Paragraph style={{textAlign: 'center'}}>请选择下方按钮进行导航。</Paragraph>
                     </Typography>
                     <Space direction="vertical" size="middle"
                            style={{display: 'flex', justifyContent: 'center', width: '100%'}}>
@@ -86,10 +86,17 @@ export default function Home() {
                             size="large"
                             type="link"
                             onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}>
-                            访问GitHub
+                            访问GitHub(可以送给我一个小⭐⭐吗)
                         </Button>
-                        <Button block icon={<MessageOutlined/>} size="large" type="primary"
-                                onClick={showModal}>提交反馈</Button>
+                        <Button
+                            block
+                            icon={<MessageOutlined/>}
+                            size="large"
+                            type="primary"
+                            onClick={showModal}
+                        >
+                            提交反馈(请您畅所欲言！！！)
+                        </Button>
                     </Space>
                 </Card>
             </Col>
