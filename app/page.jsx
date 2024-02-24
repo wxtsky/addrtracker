@@ -1,41 +1,44 @@
 "use client";
 import React, {useState} from 'react';
-import {Button, Modal, Input, message, Col, Row, Card, Typography, Space} from 'antd';
+import {Button, Modal, Input, message, Col, Row, Card, Typography, Space, Image} from 'antd';
 import {useRouter} from 'next/navigation';
-import axios from 'axios';
-import {
-    GithubOutlined,
-    MessageOutlined,
-    PushpinOutlined,
-    CloudServerOutlined,
-    SettingOutlined
-} from '@ant-design/icons';
+import {GithubOutlined, MessageOutlined} from '@ant-design/icons';
 
 const {TextArea} = Input;
 const {Title, Paragraph} = Typography;
+
+// 自定义图片导航组件
+const NavigationImage = ({src, alt, path}) => {
+    const router = useRouter();
+    return (
+        <Col xs={24} sm={12} md={8} lg={6}>
+            <Image
+                src={src}
+                alt={alt}
+                width={100} // 调整图片宽度
+                preview={false}
+                onClick={() => router.push(path)}
+                style={{cursor: 'pointer'}}
+            />
+        </Col>
+    );
+};
 
 export default function Home() {
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [feedbackTitle, setFeedbackTitle] = useState('');
     const [feedbackContent, setFeedbackContent] = useState('');
-    const router = useRouter();
+    // 图片资源和路径配置
+    const navigationImages = [
+        {src: "/zkera.png", alt: "zkSync", path: "/zksync"},
+        {src: "/linea.png", alt: "Linea", path: "/linea"},
+        {src: "/base.png", alt: "Base", path: "/base"},
+        {src: "/scroll.png", alt: "Scroll", path: "/scroll"},
+    ];
 
     const showModal = () => setIsModalVisible(true);
-
-    const handleOk = async () => {
-        try {
-            const apiEndpoint = `https://api.day.app/T9gia4FCEd5NNmDCzHnNhT/${encodeURIComponent(feedbackTitle)}/${encodeURIComponent(feedbackContent)}`;
-            await axios.post(apiEndpoint);
-            message.success('反馈发送成功！');
-            setIsModalVisible(false);
-            setFeedbackTitle('');
-            setFeedbackContent('');
-        } catch (error) {
-            console.error('反馈发送失败：', error);
-            message.error('反馈发送失败，请稍后再试。');
-        }
+    const handleOk = async () => { /* 发送反馈的逻辑 */
     };
-
     const handleCancel = () => setIsModalVisible(false);
 
     return (
@@ -44,59 +47,18 @@ export default function Home() {
                 <Card>
                     <Typography>
                         <Title level={2} style={{textAlign: 'center'}}>AddrTracker</Title>
-                        <Paragraph style={{textAlign: 'center'}}>请选择下方按钮进行导航。</Paragraph>
                     </Typography>
+                    <Row gutter={[16, 16]} justify="center">
+                        {navigationImages.map(({src, alt, path}) => (
+                            <NavigationImage key={src} src={src} alt={alt} path={path}/>
+                        ))}
+                    </Row>
                     <Space direction="vertical" size="middle"
-                           style={{display: 'flex', justifyContent: 'center', width: '100%'}}>
-                        <Button
-                            block
-                            // icon={<CloudServerOutlined/>}
-                            size="large"
-                            onClick={() => router.push('/zksync')}
-                        >
-                            zkSync
-                        </Button>
-                        <Button
-                            block
-                            // icon={<SettingOutlined/>}
-                            size="large"
-                            onClick={() => router.push('/linea')}
-                        >
-                            Linea
-                        </Button>
-                        <Button
-                            block
-                            // icon={<PushpinOutlined/>}
-                            size="large"
-                            onClick={() => router.push('/base')}
-                        >
-                            Base
-                        </Button>
-                        <Button
-                            block
-                            // icon={<MessageOutlined/>}
-                            size="large"
-                            onClick={() => router.push('/scroll')}
-                        >
-                            Scroll
-                        </Button>
-                        <Button
-                            block
-                            icon={<GithubOutlined/>}
-                            size="large"
-                            type="link"
-                            onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}>
-                            访问GitHub(可以送给我一个小⭐⭐吗)
-                        </Button>
-                        <Button
-                            block
-                            icon={<MessageOutlined/>}
-                            size="large"
-                            type="primary"
-                            onClick={showModal}
-                        >
-                            提交反馈(请您畅所欲言！！！)
-                        </Button>
+                           style={{display: 'flex', justifyContent: 'center', width: '100%', marginTop: 16}}>
+                        <Button block icon={<GithubOutlined/>} size="large" type="link"
+                                onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}>GitHub(求一个⭐,很需要~~)</Button>
+                        <Button block icon={<MessageOutlined/>} size="large" type="primary"
+                                onClick={showModal}>提交反馈(请您畅所欲言~~)</Button>
                     </Space>
                 </Card>
             </Col>
