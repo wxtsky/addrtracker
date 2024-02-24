@@ -29,7 +29,6 @@ const App = () => {
     const [notes, setNotes] = useState({});
 
     useEffect(() => {
-        // 在useEffect内部访问localStorage，以确保代码运行在浏览器环境中
         const savedNotes = localStorage.getItem('zksyncAddressNotes');
         setNotes(savedNotes ? JSON.parse(savedNotes) : {});
     }, []);
