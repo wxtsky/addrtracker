@@ -6,6 +6,9 @@ import getEthInfo from "@/services/base/getEthInfo";
 
 
 const getBaseData = async (address) => {
+    const storedNotes = window.localStorage.getItem('zksyncAddressNotes');
+    const notes = storedNotes ? JSON.parse(storedNotes) : {};
+    const note = notes[address] || '';
     const transactions = await fetchAddressTransactions(address);
     const {base_day, base_week, base_month, base_last_tx, base_gas} = calculateActivity(transactions);
     const {base_vol} = getVol(transactions);
@@ -14,6 +17,7 @@ const getBaseData = async (address) => {
     return {
         key: address,
         address,
+        note,
         base_day,
         base_week,
         base_gas,

@@ -26,6 +26,18 @@ const App = () => {
     const [progress, setProgress] = useState(0);
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    const [notes, setNotes] = useState({});
+
+    useEffect(() => {
+        // 在useEffect内部访问localStorage，以确保代码运行在浏览器环境中
+        const savedNotes = localStorage.getItem('baseAddressNotes');
+        setNotes(savedNotes ? JSON.parse(savedNotes) : {});
+    }, []);
+    const handleNoteChange = (newNote, address) => {
+        const newNotes = {...notes, [address]: newNote};
+        setNotes(newNotes);
+        window.localStorage.setItem('baseAddressNotes', JSON.stringify(newNotes));
+    };
     const columns = [
         {
             title: '序号',
@@ -40,6 +52,18 @@ const App = () => {
             dataIndex: 'address',
             key: 'address',
             width: 350,
+        },
+        {
+            title: '备注',
+            dataIndex: 'note',
+            key: 'note',
+            render: (_, record) => (
+                <Input
+                    defaultValue={notes[record.address] || ''}
+                    onBlur={(e) => handleNoteChange(e.target.value, record.address)}
+                />
+            ),
+            align: 'center'
         },
         {
             title: 'ETH Mainnet',

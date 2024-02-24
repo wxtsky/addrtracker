@@ -6,6 +6,9 @@ import getEthInfo from "@/services/linea/getEthInfo";
 
 
 const getLineaData = async (address) => {
+    const storedNotes = window.localStorage.getItem('lineaAddressNotes');
+    const notes = storedNotes ? JSON.parse(storedNotes) : {};
+    const note = notes[address] || '';
     const transactions = await fetchAddressTransactions(address);
     const {linea_day, linea_week, linea_month, linea_last_tx, linea_gas} = calculateActivity(transactions);
     const {linea_vol} = getVol(transactions);
@@ -14,6 +17,7 @@ const getLineaData = async (address) => {
     return {
         key: address,
         address,
+        note,
         linea_day,
         linea_week,
         linea_gas,

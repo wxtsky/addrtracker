@@ -6,6 +6,9 @@ import getEthInfo from "@/services/scroll/getEthInfo";
 
 
 const getScrollData = async (address) => {
+    const storedNotes = window.localStorage.getItem('scrollAddressNotes');
+    const notes = storedNotes ? JSON.parse(storedNotes) : {};
+    const note = notes[address] || '';
     const transactions = await fetchAddressTransactions(address);
     const {scroll_day, scroll_week, scroll_month, scroll_last_tx, scroll_gas} = calculateActivity(transactions);
     const {scroll_vol} = getVol(transactions);
@@ -14,6 +17,7 @@ const getScrollData = async (address) => {
     return {
         key: address,
         address,
+        note,
         scroll_day,
         scroll_week,
         scroll_gas,
