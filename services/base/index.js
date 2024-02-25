@@ -1,7 +1,6 @@
 import fetchAddressTransactions from "@/services/base/getTransactions";
 import calculateActivity from "@/services/base/getActivity";
 import getAccountDetails from "@/services/base/getAccountDetails";
-import getVol from "@/services/base/getVol";
 import getEthInfo from "@/services/base/getEthInfo";
 
 
@@ -10,8 +9,14 @@ const getBaseData = async (address) => {
     const notes = storedNotes ? JSON.parse(storedNotes) : {};
     const note = notes[address] || '';
     const transactions = await fetchAddressTransactions(address);
-    const {base_day, base_week, base_month, base_last_tx, base_gas} = calculateActivity(transactions);
-    const {base_vol} = getVol(transactions);
+    const {
+        base_day,
+        base_week,
+        base_month,
+        base_last_tx,
+        base_gas,
+        base_vol
+    } = calculateActivity(transactions, address);
     const {base_balance, base_tx} = await getAccountDetails(address);
     const {mainnet_balance, mainnet_tx} = await getEthInfo(address);
     return {
