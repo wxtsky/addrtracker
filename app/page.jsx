@@ -66,8 +66,8 @@ export default function Home() {
                     <Typography>
                         <Title level={2} style={{
                             textAlign: 'center',
-                            marginTop: '100px',
-                            marginBottom: '100px'
+                            marginTop: '20px',
+                            marginBottom: '20px'
                         }}>AddrTracker</Title>
                     </Typography>
                     <Row gutter={[16, 16]} justify="center">

@@ -1,7 +1,7 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Dropdown, Input, Menu, message, Modal, Progress, Spin} from 'antd';
+import {Button, Dropdown, FloatButton, Input, Menu, message, Modal, Progress, Spin} from 'antd';
 import getBaseData from "@/services/base";
 
 const {TextArea} = Input;
@@ -260,39 +260,6 @@ const App = () => {
         setSelectedRowKeys([]);
         message.success('选中的地址数据已刷新');
     };
-    // const refreshSelectedData = async () => {
-    //     if (selectedRowKeys.length === 0) {
-    //         message.warning('请先选择至少一个地址');
-    //         return;
-    //     }
-    //
-    //     setLoading(true);
-    //     const total = selectedRowKeys.length;
-    //     let count = 0;
-    //
-    //     for (const key of selectedRowKeys) {
-    //         setProgress((count / total) * 100);
-    //
-    //         const itemIndex = data.findIndex(item => item.key === key);
-    //         if (itemIndex !== -1) {
-    //             const item = data[itemIndex];
-    //             try {
-    //                 const updatedData = await getBaseData(item.address);
-    //                 data[itemIndex] = {...item, ...updatedData, address: item.address};
-    //                 count++;
-    //             } catch (error) {
-    //                 console.error("Error updating data for address:", item.address, error);
-    //                 message.error(`更新地址 ${item.address} 的数据时出错`);
-    //             }
-    //         }
-    //         setData([...data]);
-    //     }
-    //
-    //     setProgress(100);
-    //     setLoading(false);
-    //     setSelectedRowKeys([]);
-    //     message.success('选中的地址数据已刷新');
-    // };
 
     const handleDeleteSelected = () => {
         if (selectedRowKeys.length === 0) {
@@ -317,28 +284,6 @@ const App = () => {
             localStorage.setItem('baseData', JSON.stringify(data));
         }
     }, [data, isInitialLoad]);
-    // const fetchData = async () => {
-    //     setIsModalVisible(false);
-    //     setLoading(true);
-    //     const uniqueAddresses = new Set(addresses.split(/[\s,]+/).filter(Boolean));
-    //     const total = uniqueAddresses.size;
-    //     let count = 0;
-    //     for (const address of uniqueAddresses) {
-    //         const res = await getBaseData(address);
-    //         const index = data.findIndex(item => item.address === address);
-    //         if (index > -1) {
-    //             data[index] = res;
-    //         } else {
-    //             setData(data => [...data, res]);
-    //         }
-    //         count += 1;
-    //         setProgress((count / total) * 100);
-    //         if (count === total) {
-    //             setLoading(false);
-    //             message.success('所有地址的数据已更新');
-    //         }
-    //     }
-    // };
     const handleDelete = (key) => {
         const newData = data.filter(item => item.key !== key);
         setData(newData);
@@ -353,11 +298,8 @@ const App = () => {
                     rowKey="address"
                     bordered
                     ghost={true}
-                    pagination={{
-                        showQuickJumper: true,
-                    }}
+                    pagination={false}
                     search={false}
-                    scroll={{x: 1300, y: 600}}
                     sticky
                     rowSelection={{
                         selectedRowKeys,
@@ -390,6 +332,7 @@ const App = () => {
                     style={{height: 400}}
                 />
             </Modal>
+            <FloatButton.BackTop visibilityHeight={100} style={{right: 100, bottom: 100}} type="primary"/>
         </>
     );
 };

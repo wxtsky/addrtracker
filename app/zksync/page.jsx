@@ -1,7 +1,7 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Dropdown, Input, Menu, message, Modal, Progress, Spin} from 'antd';
+import {Button, Dropdown, FloatButton, Input, Menu, message, Modal, Progress, Spin} from 'antd';
 import getZksyncData from "@/services/zksync";
 
 const {TextArea} = Input;
@@ -96,27 +96,6 @@ const App = () => {
             align: 'center'
         },
         {
-            title: 'zkSync Lite',
-            dataIndex: 'zksynclite',
-            key: 'zksynclite',
-            children: [
-                {
-                    title: 'ETH',
-                    dataIndex: 'lite_eth',
-                    key: 'lite_eth',
-                    align: 'right',
-                    sorter: (a, b) => a.lite_eth - b.lite_eth,
-                },
-                {
-                    title: 'TX',
-                    dataIndex: 'lite_tx',
-                    key: 'lite_tx',
-                    align: 'right',
-                    sorter: (a, b) => a.lite_tx - b.lite_tx,
-                },
-            ],
-        },
-        {
             title: 'ETH Mainnet',
             dataIndex: 'mainnet',
             key: 'mainnet',
@@ -134,6 +113,27 @@ const App = () => {
                     key: 'mainnet_tx',
                     align: 'right',
                     sorter: (a, b) => a.mainnet_tx - b.mainnet_tx,
+                },
+            ],
+        },
+        {
+            title: 'zkSync Lite',
+            dataIndex: 'zksynclite',
+            key: 'zksynclite',
+            children: [
+                {
+                    title: 'ETH',
+                    dataIndex: 'lite_eth',
+                    key: 'lite_eth',
+                    align: 'right',
+                    sorter: (a, b) => a.lite_eth - b.lite_eth,
+                },
+                {
+                    title: 'TX',
+                    dataIndex: 'lite_tx',
+                    key: 'lite_tx',
+                    align: 'right',
+                    sorter: (a, b) => a.lite_tx - b.lite_tx,
                 },
             ],
         },
@@ -260,7 +260,7 @@ const App = () => {
         }
         setProgress(0);
         setLoading(true);
-        const chunks = chunkArray([...selectedRowKeys], 5); // 每批处理5个地址
+        const chunks = chunkArray([...selectedRowKeys], 5);
 
         for (const chunk of chunks) {
             await Promise.all(
@@ -327,11 +327,8 @@ const App = () => {
                     rowKey="address"
                     bordered
                     ghost={true}
-                    pagination={{
-                        showQuickJumper: true,
-                    }}
+                    pagination={false}
                     search={false}
-                    scroll={{x: 1300, y: 600}}
                     sticky
                     rowSelection={{
                         selectedRowKeys,
@@ -364,6 +361,7 @@ const App = () => {
                     style={{height: 400}}
                 />
             </Modal>
+            <FloatButton.BackTop visibilityHeight={100} style={{right: 100, bottom: 100}} type="primary"/>
         </>
     );
 };
