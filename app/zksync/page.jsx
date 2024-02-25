@@ -1,12 +1,13 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Input, message, Modal, Progress, Spin} from 'antd';
+import {Button, Dropdown, Input, Menu, message, Modal, Progress, Spin} from 'antd';
 import getZksyncData from "@/services/zksync";
 
 const {TextArea} = Input;
 import {saveAs} from 'file-saver';
 import * as XLSX from 'xlsx';
+import {DownOutlined} from "@ant-design/icons";
 
 const exportToExcel = (data, fileName) => {
     const ws = XLSX.utils.json_to_sheet(data);
@@ -17,7 +18,20 @@ const exportToExcel = (data, fileName) => {
 
     saveAs(dataBlob, fileName + '.xlsx');
 };
-
+const addressFormatOptions = {
+    full: {
+        format: (address) => address,
+        width: 370,
+    },
+    short: {
+        format: (address) => `${address.substring(0, 4)}****${address.substring(address.length - 4)}`,
+        width: 150,
+    },
+    hidden: {
+        format: () => '****',
+        width: 100,
+    },
+};
 const App = () => {
     const [data, setData] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -27,7 +41,7 @@ const App = () => {
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [notes, setNotes] = useState({});
-
+    const [addressFormat, setAddressFormat] = useState('full');
     useEffect(() => {
         const savedNotes = localStorage.getItem('zksyncAddressNotes');
         setNotes(savedNotes ? JSON.parse(savedNotes) : {});
@@ -38,7 +52,21 @@ const App = () => {
         window.localStorage.setItem('zksyncAddressNotes', JSON.stringify(newNotes));
     };
 
+    const addressDropdownMenu = (
+        <Menu onClick={(e) => setAddressFormat(e.key)}>
+            <Menu.Item key="full">显示完整地址</Menu.Item>
+            <Menu.Item key="short">显示前4后4</Menu.Item>
+            <Menu.Item key="hidden">隐藏地址</Menu.Item>
+        </Menu>
+    );
 
+    const addressColumnTitle = (
+        <Dropdown overlay={addressDropdownMenu} trigger={['click']}>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                地址 <DownOutlined/>
+            </a>
+        </Dropdown>
+    );
     const columns = [
         {
             title: '序号',
@@ -49,10 +77,11 @@ const App = () => {
             align: 'center',
         },
         {
-            title: '地址',
+            title: addressColumnTitle,
             dataIndex: 'address',
             key: 'address',
-            width: 370,
+            render: (address) => addressFormatOptions[addressFormat].format(address),
+            width: addressFormatOptions[addressFormat].width,
         },
         {
             title: '备注',
@@ -259,62 +288,6 @@ const App = () => {
         setSelectedRowKeys([]);
         message.success('选中的地址数据已刷新');
     };
-
-    // const fetchData = async () => {
-    //     setIsModalVisible(false);
-    //     setLoading(true);
-    //     const uniqueAddresses = new Set(addresses.split(/[\s,]+/).filter(Boolean));
-    //     const total = uniqueAddresses.size;
-    //     let count = 0;
-    //     for (const address of uniqueAddresses) {
-    //         const res = await getZksyncData(address);
-    //         const index = data.findIndex(item => item.address === address);
-    //         if (index > -1) {
-    //             data[index] = res;
-    //         } else {
-    //             setData(data => [...data, res]);
-    //         }
-    //         count += 1;
-    //         setProgress((count / total) * 100);
-    //         if (count === total) {
-    //             setLoading(false);
-    //             message.success('所有地址的数据已更新');
-    //         }
-    //     }
-    // };
-    // const refreshSelectedData = async () => {
-    //     if (selectedRowKeys.length === 0) {
-    //         message.warning('请先选择至少一个地址');
-    //         return;
-    //     }
-    //
-    //     setLoading(true);
-    //     const total = selectedRowKeys.length;
-    //     let count = 0;
-    //
-    //     for (const key of selectedRowKeys) {
-    //         setProgress((count / total) * 100);
-    //
-    //         const itemIndex = data.findIndex(item => item.key === key);
-    //         if (itemIndex !== -1) {
-    //             const item = data[itemIndex];
-    //             try {
-    //                 const updatedData = await getZksyncData(item.address);
-    //                 data[itemIndex] = {...item, ...updatedData, address: item.address};
-    //                 count++;
-    //             } catch (error) {
-    //                 console.error("Error updating data for address:", item.address, error);
-    //                 message.error(`更新地址 ${item.address} 的数据时出错`);
-    //             }
-    //         }
-    //         setData([...data]);
-    //     }
-    //
-    //     setProgress(100);
-    //     setLoading(false);
-    //     setSelectedRowKeys([]);
-    //     message.success('选中的地址数据已刷新');
-    // };
 
     const handleDeleteSelected = () => {
         if (selectedRowKeys.length === 0) {

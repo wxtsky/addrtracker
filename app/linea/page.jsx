@@ -1,13 +1,14 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Input, message, Modal, Progress, Spin} from 'antd';
+import {Button, Dropdown, Input, Menu, message, Modal, Progress, Spin} from 'antd';
 import getLineaData from "@/services/linea";
 
 const {TextArea} = Input;
 import {saveAs} from 'file-saver';
 import * as XLSX from 'xlsx';
 import getZksyncData from "@/services/zksync";
+import {DownOutlined} from "@ant-design/icons";
 
 const exportToExcel = (data, fileName) => {
     const ws = XLSX.utils.json_to_sheet(data);
@@ -18,7 +19,20 @@ const exportToExcel = (data, fileName) => {
 
     saveAs(dataBlob, fileName + '.xlsx');
 };
-
+const addressFormatOptions = {
+    full: {
+        format: (address) => address,
+        width: 370,
+    },
+    short: {
+        format: (address) => `${address.substring(0, 4)}****${address.substring(address.length - 4)}`,
+        width: 150,
+    },
+    hidden: {
+        format: () => '****',
+        width: 100,
+    },
+};
 const App = () => {
     const [data, setData] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -28,7 +42,7 @@ const App = () => {
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [notes, setNotes] = useState({});
-
+    const [addressFormat, setAddressFormat] = useState('full');
     useEffect(() => {
         const savedNotes = localStorage.getItem('lineaAddressNotes');
         setNotes(savedNotes ? JSON.parse(savedNotes) : {});
@@ -38,6 +52,21 @@ const App = () => {
         setNotes(newNotes);
         window.localStorage.setItem('lineaAddressNotes', JSON.stringify(newNotes));
     };
+    const addressDropdownMenu = (
+        <Menu onClick={(e) => setAddressFormat(e.key)}>
+            <Menu.Item key="full">显示完整地址</Menu.Item>
+            <Menu.Item key="short">显示前4后4</Menu.Item>
+            <Menu.Item key="hidden">隐藏地址</Menu.Item>
+        </Menu>
+    );
+
+    const addressColumnTitle = (
+        <Dropdown overlay={addressDropdownMenu} trigger={['click']}>
+            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
+                地址 <DownOutlined/>
+            </a>
+        </Dropdown>
+    );
     const columns = [
         {
             title: '序号',
@@ -48,10 +77,11 @@ const App = () => {
             align: 'center',
         },
         {
-            title: '地址',
+            title: addressColumnTitle,
             dataIndex: 'address',
             key: 'address',
-            width: 350,
+            render: (address) => addressFormatOptions[addressFormat].format(address),
+            width: addressFormatOptions[addressFormat].width,
         },
         {
             title: '备注',
