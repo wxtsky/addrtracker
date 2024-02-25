@@ -6,20 +6,27 @@ import {GithubOutlined, MessageOutlined} from '@ant-design/icons';
 import axios from "axios";
 
 const {TextArea} = Input;
-const {Title, Paragraph} = Typography;
+const {Title, Text} = Typography;
 
-const NavigationImage = ({src, alt, path}) => {
+const NavigationImage = ({src, alt, path, title}) => {
     const router = useRouter();
     return (
-        <Col xs={12} sm={8} md={6} lg={6} xl={6}>
-            <Image
-                src={src}
-                alt={alt}
-                width={100}
-                preview={false}
-                onClick={() => router.push(path)}
-                style={{cursor: 'pointer', padding: '8px'}}
-            />
+        <Col xs={12} sm={8} md={6} lg={4} xl={4}
+             style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20}}>
+            {/* 使用flex布局使得内容垂直排列，并居中对齐 */}
+            <div>
+                <Image
+                    src={src}
+                    alt={alt}
+                    width={100}
+                    preview={false}
+                    onClick={() => router.push(path)}
+                    style={{cursor: 'pointer'}}
+                />
+            </div>
+            <div style={{marginTop: 8}}> {/* 添加一些间距 */}
+                <Text>{title}</Text>
+            </div>
         </Col>
     );
 };
@@ -29,11 +36,12 @@ export default function Home() {
     const [feedbackTitle, setFeedbackTitle] = useState('');
     const [feedbackContent, setFeedbackContent] = useState('');
     const navigationImages = [
-        {src: "/zkera.png", alt: "zkSync", path: "/zksync"},
-        {src: "/linea.png", alt: "Linea", path: "/linea"},
-        {src: "/base.png", alt: "Base", path: "/base"},
-        {src: "/scroll.png", alt: "Scroll", path: "/scroll"},
+        {src: "/zkera.png", alt: "zkSync", path: "/zksync", title: "zkSync"},
+        {src: "/linea.png", alt: "Linea", path: "/linea", title: "Linea"},
+        {src: "/base.png", alt: "Base", path: "/base", title: "Base"},
+        {src: "/scroll.png", alt: "Scroll", path: "/scroll", title: "Scroll"},
     ];
+
 
     const showModal = () => setIsModalVisible(true);
     const handleOk = async () => {
@@ -56,11 +64,15 @@ export default function Home() {
             <Col span={24} lg={16} xl={12}>
                 <Card>
                     <Typography>
-                        <Title level={2} style={{textAlign: 'center'}}>AddrTracker</Title>
+                        <Title level={2} style={{
+                            textAlign: 'center',
+                            marginTop: '100px',
+                            marginBottom: '100px'
+                        }}>AddrTracker</Title>
                     </Typography>
                     <Row gutter={[16, 16]} justify="center">
-                        {navigationImages.map(({src, alt, path}) => (
-                            <NavigationImage key={src} src={src} alt={alt} path={path}/>
+                        {navigationImages.map(({src, alt, path, title}) => (
+                            <NavigationImage key={src} src={src} alt={alt} path={path} title={title}/>
                         ))}
                     </Row>
                     <Space direction="vertical" size="middle"
