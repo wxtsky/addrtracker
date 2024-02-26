@@ -88,12 +88,15 @@ const App = () => {
             dataIndex: 'note',
             key: 'note',
             render: (_, record) => (
-                <Input
+                <TextArea
                     defaultValue={notes[record.address] || ''}
                     onBlur={(e) => handleNoteChange(e.target.value, record.address)}
+                    autoSize={{minRows: 1}}
+                    style={{minHeight: '32px'}}
                 />
             ),
-            align: 'center'
+            align: 'center',
+            width: 100,
         },
         {
             title: 'ETH Mainnet',
@@ -213,9 +216,10 @@ const App = () => {
             key: 'operation',
             align: 'center',
             render: (_, record) => (
-                <Button type="link" onClick={() => handleDelete(record.key)}>删除</Button>
+                record.loading ? <Spin size="small"/> :
+                    <Button danger size={'small'} onClick={() => handleDelete(record.address)}>删除</Button>
             ),
-        }
+        },
     ];
     const chunkArray = (arr, size) =>
         arr.length > size
@@ -225,32 +229,46 @@ const App = () => {
         setIsModalVisible(false);
         setLoading(true);
         setProgress(0);
-        const uniqueAddresses = Array.from(new Set(addresses.split(/[\s,]+/).filter(Boolean)));
-        const chunks = chunkArray([...uniqueAddresses], 5)
 
-        for (const chunk of chunks) {
-            await Promise.all(
-                chunk.map(async address => {
-                    try {
-                        const res = await getZksyncData(address);
-                        setData(data => {
-                            const index = data.findIndex(item => item.address === address);
-                            if (index > -1) {
-                                return [...data.slice(0, index), res, ...data.slice(index + 1)];
-                            } else {
-                                return [...data, res];
-                            }
-                        });
-                    } catch (error) {
-                        console.error(`Error fetching data for address: ${address}`, error);
-                    }
-                })
-            );
-            setProgress(prevProgress => prevProgress + (chunk.length / uniqueAddresses.length) * 100);
+        const inputAddresses = addresses.split(/[\s,]+/).filter(Boolean);
+        const uniqueInputAddresses = Array.from(new Set(inputAddresses.map(address => address.toLowerCase())));
+        const existingAddresses = data.map(item => item.address.toLowerCase());
+        const newAddresses = uniqueInputAddresses.filter(address => !existingAddresses.includes(address));
+        const initialData = [...data, ...newAddresses.map(address => ({
+            address,
+            loading: true,
+        }))];
+
+        setData(initialData);
+        const batchSize = 5;
+        for (let i = 0; i < newAddresses.length; i += batchSize) {
+            const batch = newAddresses.slice(i, i + batchSize);
+            await Promise.all(batch.map(async (address) => {
+                try {
+                    const res = await getZksyncData(address);
+                    setData(currentData => {
+                        const newData = [...currentData];
+                        const itemIndex = newData.findIndex(item => item.address.toLowerCase() === address);
+                        if (itemIndex !== -1) {
+                            newData[itemIndex] = {...newData[itemIndex], ...res, loading: false};
+                        }
+                        return newData;
+                    });
+                } catch (error) {
+                    console.error(`Error fetching data for address: ${address}`, error);
+                    setData(currentData => {
+                        const newData = [...currentData];
+                        const itemIndex = newData.findIndex(item => item.address.toLowerCase() === address);
+                        if (itemIndex !== -1) {
+                            newData[itemIndex] = {...newData[itemIndex], loading: false, error: true};
+                        }
+                        return newData;
+                    });
+                }
+            }));
+            setProgress((i + batchSize) / newAddresses.length * 100);
         }
-
         setLoading(false);
-        message.success('所有地址的数据已更新');
     };
 
     const refreshSelectedData = async () => {
@@ -258,33 +276,34 @@ const App = () => {
             message.warning('请先选择至少一个地址');
             return;
         }
-        setProgress(0);
-        setLoading(true);
+
+        setData(currentData => currentData.map(item =>
+            selectedRowKeys.includes(item.key) ? {...item, loading: true} : item
+        ));
+
         const chunks = chunkArray([...selectedRowKeys], 5);
 
         for (const chunk of chunks) {
-            await Promise.all(
-                chunk.map(async key => {
-                    const itemIndex = data.findIndex(item => item.key === key);
-                    if (itemIndex !== -1) {
-                        try {
-                            const item = data[itemIndex];
-                            const updatedData = await getZksyncData(item.address);
-                            setData(prevData => {
-                                prevData[itemIndex] = {...item, ...updatedData, address: item.address};
-                                return [...prevData];
-                            });
-                        } catch (error) {
-                            console.error(`Error updating data for address: ${item.address}`, error);
-                            message.error(`更新地址 ${item.address} 的数据时出错`);
-                        }
+            await Promise.all(chunk.map(async key => {
+                const itemIndex = data.findIndex(item => item.key === key);
+                if (itemIndex !== -1) {
+                    try {
+                        const item = data[itemIndex];
+                        const updatedData = await getZksyncData(item.address);
+                        setData(prevData => prevData.map(dataItem =>
+                            dataItem.key === key ? {...dataItem, ...updatedData, loading: false} : dataItem
+                        ));
+                    } catch (error) {
+                        console.error(`Error updating data for address: ${data[itemIndex].address}`, error);
+                        message.error(`更新地址 ${data[itemIndex].address} 的数据时出错`);
+                        setData(prevData => prevData.map(dataItem =>
+                            dataItem.key === key ? {...dataItem, loading: false, error: true} : dataItem
+                        ));
                     }
-                })
-            );
-            setProgress(prevProgress => prevProgress + (chunk.length / selectedRowKeys.length) * 100);
+                }
+            }));
         }
 
-        setLoading(false);
         setSelectedRowKeys([]);
         message.success('选中的地址数据已刷新');
     };
@@ -320,33 +339,32 @@ const App = () => {
     return (
         <>
             {loading && <Progress percent={Math.round(progress)}/>}
-            <Spin spinning={loading} tip={`正在获取数据... `}>
-                <ProTable
-                    columns={columns}
-                    dataSource={data}
-                    rowKey="address"
-                    bordered
-                    ghost={true}
-                    pagination={false}
-                    search={false}
-                    sticky
-                    rowSelection={{
-                        selectedRowKeys,
-                        onChange: setSelectedRowKeys,
-                    }}
-                    toolBarRender={() => [
-                        <Button key="back" type={'link'} onClick={() => window.location.href = '/'}>首页</Button>,
-                        <Button key="addAddress" onClick={() => setIsModalVisible(true)}>
-                            添加地址
-                        </Button>,
-                        <Button key="refreshSelected" type="default" onClick={refreshSelectedData}>
-                            刷新选中行数据
-                        </Button>,
-                        <Button key="deleteSelected" onClick={handleDeleteSelected}>删除选中地址</Button>,
-                        <Button onClick={() => exportToExcel(data, 'zkSyncData')}>导出数据</Button>,
-                    ]}
-                />
-            </Spin>
+            <ProTable
+                columns={columns}
+                dataSource={data}
+                rowKey="address"
+                bordered
+                ghost={true}
+                pagination={false}
+                search={false}
+                sticky
+                scroll={{x: 1500}}
+                rowSelection={{
+                    selectedRowKeys,
+                    onChange: setSelectedRowKeys,
+                }}
+                toolBarRender={() => [
+                    <Button key="back" type={'link'} onClick={() => window.location.href = '/'}>首页</Button>,
+                    <Button key="addAddress" onClick={() => setIsModalVisible(true)}>
+                        添加地址
+                    </Button>,
+                    <Button key="refreshSelected" type="default" onClick={refreshSelectedData}>
+                        刷新选中行数据
+                    </Button>,
+                    <Button key="deleteSelected" onClick={handleDeleteSelected}>删除选中地址</Button>,
+                    <Button onClick={() => exportToExcel(data, 'zkSyncData')}>导出数据</Button>,
+                ]}
+            />
             <Modal
                 title="输入地址"
                 open={isModalVisible}

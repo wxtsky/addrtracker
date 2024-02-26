@@ -10,26 +10,36 @@ const {Title, Text} = Typography;
 
 const NavigationImage = ({src, alt, path, title}) => {
     const router = useRouter();
+
+    // 点击时的样式变化
+    const handleImageClick = () => {
+        router.push(path);
+    };
+
     return (
-        <Col xs={12} sm={8} md={6} lg={4} xl={4}
+        <Col xs={24} sm={12} md={8} lg={6} xl={6}
              style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 20}}>
-            {/* 使用flex布局使得内容垂直排列，并居中对齐 */}
-            <div>
+            <div style={{width: '100%', display: 'flex', justifyContent: 'center'}}>
                 <Image
                     src={src}
                     alt={alt}
-                    width={100}
+                    width={120}
+                    height={120}
+                    style={{objectFit: 'cover', cursor: 'pointer', transition: 'transform 0.2s ease'}}
                     preview={false}
-                    onClick={() => router.push(path)}
-                    style={{cursor: 'pointer'}}
+                    onClick={handleImageClick}
+                    onMouseDown={(e) => e.currentTarget.style.transform = 'scale(0.95)'}
+                    onMouseUp={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 />
             </div>
-            <div style={{marginTop: 8}}> {/* 添加一些间距 */}
-                <Text>{title}</Text>
+            <div style={{marginTop: 12}}>
+                <Text style={{fontSize: '18px'}}>{title}</Text>
             </div>
         </Col>
     );
 };
+
 
 export default function Home() {
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -79,10 +89,10 @@ export default function Home() {
                            style={{display: 'flex', justifyContent: 'center', width: '100%', marginTop: 24}}>
                         <Button block icon={<GithubOutlined/>} size="large" type="link"
                                 style={{marginTop: '16px'}}
-                                onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}>GitHub(求一个⭐,很需要~~)</Button>
+                                onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}>GitHub(求一键三连~~谢谢)</Button>
                         <Button block icon={<MessageOutlined/>} size="large" type="primary"
                                 style={{marginTop: '16px'}}
-                                onClick={showModal}>提交反馈(请您畅所欲言~~)</Button>
+                                onClick={showModal}>提交反馈</Button>
                     </Space>
                 </Card>
             </Col>
