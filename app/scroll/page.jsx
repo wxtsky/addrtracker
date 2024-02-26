@@ -87,12 +87,15 @@ const App = () => {
             dataIndex: 'note',
             key: 'note',
             render: (_, record) => (
-                <Input
+                <TextArea
                     defaultValue={notes[record.address] || ''}
                     onBlur={(e) => handleNoteChange(e.target.value, record.address)}
+                    autoSize={{minRows: 1}}
+                    style={{minHeight: '32px'}}
                 />
             ),
-            align: 'center'
+            align: 'center',
+            width: 100,
         },
         {
             title: 'ETH Mainnet',
