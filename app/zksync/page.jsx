@@ -32,6 +32,11 @@ const addressFormatOptions = {
         width: 100,
     },
 };
+
+function isValidateDate(date) {
+    return date instanceof Date && !isNaN(date);
+}
+
 const App = () => {
     const [data, setData] = useState([]);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -96,7 +101,7 @@ const App = () => {
                 />
             ),
             align: 'center',
-            width: 100,
+            width: 80,
         },
         {
             title: 'ETH Mainnet',
@@ -115,6 +120,7 @@ const App = () => {
                     dataIndex: 'mainnet_tx',
                     key: 'mainnet_tx',
                     align: 'right',
+                    width: 50,
                     sorter: (a, b) => a.mainnet_tx - b.mainnet_tx,
                 },
             ],
@@ -136,6 +142,7 @@ const App = () => {
                     dataIndex: 'lite_tx',
                     key: 'lite_tx',
                     align: 'right',
+                    width: 50,
                     sorter: (a, b) => a.lite_tx - b.lite_tx,
                 },
             ],
@@ -157,6 +164,7 @@ const App = () => {
                     dataIndex: 'era_tx',
                     key: 'era_tx',
                     align: 'right',
+                    width: 50,
                     sorter: (a, b) => a.era_tx - b.era_tx,
                 },
                 {
@@ -204,6 +212,8 @@ const App = () => {
                     key: 'era_last_tx',
                     align: 'right',
                     width: 90,
+                    render: (text) => isValidateDate(new Date(text)) ? new Date(text * 1000).toLocaleDateString() : text,
+                    sorter: (a, b) => a.era_last_tx - b.era_last_tx,
                 },
                 {
                     title: 'VOL(E)',

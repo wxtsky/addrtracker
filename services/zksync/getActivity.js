@@ -40,7 +40,7 @@ export default function calculateActivity(transactions, address) {
         era_week: activity.weekly.size,
         era_month: activity.monthly.size,
         era_gas: (Number(totalFee) / 1e18).toFixed(4),
-        era_last_tx: transactions.length > 0 ? timestampToDate(transactions[0].timestamp * 1000) : "N/A",
+        era_last_tx: transactions.length > 0 ? transactions[0].timestamp : "N/A",
         era_contract: activity.contract.size,
         era_vol: era_vol.toFixed(3),
         era_paymaster: activity.paymaster.size,
