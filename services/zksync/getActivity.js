@@ -11,7 +11,8 @@ export default function calculateActivity(transactions, address) {
         daily: new Set(),
         weekly: new Set(),
         monthly: new Set(),
-        contract: new Set()
+        contract: new Set(),
+        paymaster: new Set()
     };
     let totalFee = 0
     let era_vol = 0
@@ -28,6 +29,9 @@ export default function calculateActivity(transactions, address) {
             totalFee += Number(transaction.fee);
             activity.contract.add(transaction.to_address);
             era_vol += Number(transaction.value)
+            if (transaction.transaction_type === "0x71") {
+                activity.paymaster.add(transaction.to_address);
+            }
         }
     });
 
@@ -38,7 +42,8 @@ export default function calculateActivity(transactions, address) {
         era_gas: (Number(totalFee) / 1e18).toFixed(4),
         era_last_tx: transactions.length > 0 ? timestampToDate(transactions[0].timestamp * 1000) : "N/A",
         era_contract: activity.contract.size,
-        era_vol: era_vol.toFixed(3)
+        era_vol: era_vol.toFixed(3),
+        era_paymaster: activity.paymaster.size,
     };
 }
 

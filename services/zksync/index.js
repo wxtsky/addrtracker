@@ -16,7 +16,8 @@ const getZksyncData = async (address) => {
         era_last_tx,
         era_gas,
         era_contract,
-        era_vol
+        era_vol,
+        era_paymaster
     } = calculateActivity(transactions, address);
     const {era_balance, era_tx} = await getAccountDetails(address);
     const {lite_eth, lite_tx} = await getLiteInfo(address);
@@ -34,6 +35,7 @@ const getZksyncData = async (address) => {
         era_month,
         era_vol,
         era_tx,
+        era_paymaster,
         era_contract,
         era_balance,
         lite_eth,

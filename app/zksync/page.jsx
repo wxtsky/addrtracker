@@ -164,6 +164,7 @@ const App = () => {
                     dataIndex: 'era_day',
                     key: 'era_day',
                     align: 'right',
+                    width: 50,
                     sorter: (a, b) => a.era_day - b.era_day,
                 },
                 {
@@ -171,6 +172,7 @@ const App = () => {
                     dataIndex: 'era_week',
                     key: 'era_week',
                     align: 'right',
+                    width: 50,
                     sorter: (a, b) => a.era_week - b.era_week,
                 },
                 {
@@ -178,6 +180,7 @@ const App = () => {
                     dataIndex: 'era_month',
                     key: 'era_month',
                     align: 'right',
+                    width: 50,
                     sorter: (a, b) => a.era_month - b.era_month,
                 },
                 {
@@ -186,6 +189,14 @@ const App = () => {
                     key: 'era_contract',
                     align: 'right',
                     sorter: (a, b) => a.era_contract - b.era_contract,
+                },
+                {
+                    title: 'PayMaster',
+                    dataIndex: 'era_paymaster',
+                    key: 'era_paymaster',
+                    align: 'right',
+                    width: 90,
+                    sorter: (a, b) => a.era_paymaster - b.era_paymaster,
                 },
                 {
                     title: '最后交易',

@@ -21,6 +21,7 @@ export default async function fetchAddressTransactions(address, cursor = null, a
             "to_address": tx.to_address,
             "from_address": tx.from_address,
             "method_name": tx.method_name,
+            "transaction_type": tx.transaction_type,
         }));
         const accumulatedNewList = [...accumulatedList, ...newList];
         if (nextCursor !== null) {
