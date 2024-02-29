@@ -2,7 +2,7 @@
 import React, {useState} from 'react';
 import {Button, Modal, Input, message, Col, Row, Card, Typography, Space, Image} from 'antd';
 import {useRouter} from 'next/navigation';
-import {GithubOutlined, MessageOutlined} from '@ant-design/icons';
+import {GithubOutlined, MessageOutlined, RedoOutlined} from '@ant-design/icons';
 import axios from "axios";
 
 const {TextArea} = Input;
@@ -52,6 +52,7 @@ export default function Home() {
         {src: "/scroll.png", alt: "Scroll", path: "/scroll", title: "Scroll"},
     ];
 
+    const router = useRouter();
 
     const showModal = () => setIsModalVisible(true);
     const handleOk = async () => {
@@ -87,6 +88,12 @@ export default function Home() {
                     </Row>
                     <Space direction="vertical" size="middle"
                            style={{display: 'flex', justifyContent: 'center', width: '100%', marginTop: 24}}>
+                        <Button block icon={<RedoOutlined/>}
+                                size="large" type="primary"
+                                style={{marginTop: '16px'}}
+                                onClick={() => router.push('/random')}>
+                            随机任务生成
+                        </Button>
                         <Button block icon={<GithubOutlined/>} size="large" type="link"
                                 style={{marginTop: '16px'}}
                                 onClick={() => window.open('https://github.com/wxtsky/addrtracker', '_blank')}>GitHub(求一键三连~~谢谢)</Button>
