@@ -3,6 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
 import {Button, Dropdown, FloatButton, Input, Menu, message, Modal, Progress, Spin} from 'antd';
 import getZksyncData from "@/services/zksync";
+import getEthPrice from "@/services/getEthPrice";
 
 const {TextArea} = Input;
 import {saveAs} from 'file-saver';
@@ -47,6 +48,8 @@ const App = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [notes, setNotes] = useState({});
     const [addressFormat, setAddressFormat] = useState('full');
+    const [ethPrice, setEthPrice] = useState(0)
+
     useEffect(() => {
         const savedNotes = localStorage.getItem('zksyncAddressNotes');
         setNotes(savedNotes ? JSON.parse(savedNotes) : {});
@@ -216,18 +219,20 @@ const App = () => {
                     sorter: (a, b) => a.era_last_tx - b.era_last_tx,
                 },
                 {
-                    title: 'VOL(E)',
+                    title: 'VOL(U)',
                     dataIndex: 'era_vol',
                     key: 'era_vol',
                     align: 'right',
                     sorter: (a, b) => a.era_vol - b.era_vol,
+                    render: (text) => (ethPrice * Number(text)).toFixed(2)
                 },
                 {
-                    title: 'Gas(E)',
+                    title: 'Gas(U)',
                     dataIndex: 'era_gas',
                     key: 'era_gas',
                     align: 'right',
                     sorter: (a, b) => a.era_gas - b.era_gas,
+                    render: (text) => (ethPrice * Number(text)).toFixed(2)
                 }
             ],
         },
@@ -250,7 +255,8 @@ const App = () => {
         setIsModalVisible(false);
         setLoading(true);
         setProgress(0);
-
+        const ethPrice = await getEthPrice();
+        setEthPrice(ethPrice)
         const inputAddresses = addresses.split(/[\s,]+/).filter(Boolean);
         const uniqueInputAddresses = Array.from(new Set(inputAddresses.map(address => address.toLowerCase())));
         const existingAddresses = data.map(item => item.address.toLowerCase());
@@ -259,7 +265,6 @@ const App = () => {
             address,
             loading: true,
         }))];
-
         setData(initialData);
         const batchSize = 5;
         for (let i = 0; i < newAddresses.length; i += batchSize) {
@@ -297,7 +302,8 @@ const App = () => {
             message.warning('请先选择至少一个地址');
             return;
         }
-
+        const ethPrice = await getEthPrice();
+        setEthPrice(ethPrice)
         setData(currentData => currentData.map(item =>
             selectedRowKeys.includes(item.key) ? {...item, loading: true} : item
         ));

@@ -3,6 +3,7 @@ import calculateActivity from "@/services/zksync/getActivity";
 import getAccountDetails from "@/services/zksync/getAccountDetails";
 import getLiteInfo from "@/services/zksync/getLiteInfo";
 import getEthInfo from "@/services/zksync/getEthInfo";
+import getEthPrice from "@/services/getEthPrice";
 
 const getZksyncData = async (address) => {
     const storedNotes = window.localStorage.getItem('zksyncAddressNotes');

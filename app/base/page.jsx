@@ -8,6 +8,7 @@ const {TextArea} = Input;
 import {saveAs} from 'file-saver';
 import * as XLSX from 'xlsx';
 import {DownOutlined} from "@ant-design/icons";
+import getEthPrice from "@/services/getEthPrice";
 
 const exportToExcel = (data, fileName) => {
     const ws = XLSX.utils.json_to_sheet(data);
@@ -42,6 +43,7 @@ const App = () => {
     const [selectedRowKeys, setSelectedRowKeys] = useState([]);
     const [notes, setNotes] = useState({});
     const [addressFormat, setAddressFormat] = useState('full');
+    const [ethPrice, setEthPrice] = useState(0)
     useEffect(() => {
         const savedNotes = localStorage.getItem('baseAddressNotes');
         setNotes(savedNotes ? JSON.parse(savedNotes) : {});
@@ -166,18 +168,20 @@ const App = () => {
                     width: 90,
                 },
                 {
-                    title: 'VOL(E)',
+                    title: 'VOL(U)',
                     dataIndex: 'base_vol',
                     key: 'base_vol',
                     align: 'right',
                     sorter: (a, b) => a.base_vol - b.base_vol,
+                    render: (text) => (ethPrice * Number(text)).toFixed(2)
                 },
                 {
-                    title: 'Gas(E)',
+                    title: 'Gas(U)',
                     dataIndex: 'base_gas',
                     key: 'base_gas',
                     align: 'right',
                     sorter: (a, b) => a.base_gas - b.base_gas,
+                    render: (text) => (ethPrice * Number(text)).toFixed(2)
                 }
             ],
         },
@@ -200,7 +204,8 @@ const App = () => {
         setIsModalVisible(false);
         setLoading(true);
         setProgress(0);
-
+        const ethPrice = await getEthPrice();
+        setEthPrice(ethPrice)
         const inputAddresses = addresses.split(/[\s,]+/).filter(Boolean);
         const uniqueInputAddresses = Array.from(new Set(inputAddresses.map(address => address.toLowerCase())));
         const existingAddresses = data.map(item => item.address.toLowerCase());
@@ -247,7 +252,8 @@ const App = () => {
             message.warning('请先选择至少一个地址');
             return;
         }
-
+        const ethPrice = await getEthPrice();
+        setEthPrice(ethPrice)
         setData(currentData => currentData.map(item =>
             selectedRowKeys.includes(item.key) ? {...item, loading: true} : item
         ));
