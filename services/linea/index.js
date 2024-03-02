@@ -2,7 +2,7 @@ import fetchAddressTransactions from "@/services/linea/getTransactions";
 import calculateActivity from "@/services/linea/getActivity";
 import getAccountDetails from "@/services/linea/getAccountDetails";
 import getEthInfo from "@/services/linea/getEthInfo";
-
+import getPoh from "@/services/linea/getPoh";
 
 const getLineaData = async (address) => {
     const storedNotes = window.localStorage.getItem('lineaAddressNotes');
@@ -19,6 +19,7 @@ const getLineaData = async (address) => {
     } = calculateActivity(transactions, address);
     const {linea_balance, linea_tx, xp_balance} = await getAccountDetails(address);
     const {mainnet_balance, mainnet_tx} = await getEthInfo(address);
+    const isPoh = await getPoh(address);
     return {
         key: address,
         address,
@@ -33,7 +34,8 @@ const getLineaData = async (address) => {
         linea_balance,
         mainnet_balance,
         mainnet_tx,
-        xp_balance
+        xp_balance,
+        isPoh
     }
 }
 export default getLineaData;

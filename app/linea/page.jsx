@@ -1,7 +1,7 @@
 "use client";
 import React, {useEffect, useState} from 'react';
 import {ProTable} from "@ant-design/pro-components";
-import {Button, Dropdown, FloatButton, Input, Menu, message, Modal, Progress, Spin} from 'antd';
+import {Button, Dropdown, FloatButton, Input, Menu, message, Modal, Progress, Spin, Tag} from 'antd';
 import getLineaData from "@/services/linea";
 
 const {TextArea} = Input;
@@ -189,6 +189,13 @@ const App = () => {
                     key: 'xp_balance',
                     align: 'right',
                     sorter: (a, b) => a.xp_balance - b.xp_balance,
+                },
+                {
+                    title: 'POH',
+                    dataIndex: 'isPoh',
+                    key: 'isPoh',
+                    align: 'right',
+                    render: (text) => text ? <Tag color="green">是</Tag> : <Tag color="red">否</Tag>,
                 }
             ],
         },
