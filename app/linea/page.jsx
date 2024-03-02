@@ -182,6 +182,13 @@ const App = () => {
                     align: 'right',
                     sorter: (a, b) => a.linea_gas - b.linea_gas,
                     render: (text) => (ethPrice * Number(text)).toFixed(2),
+                },
+                {
+                    title: 'LXP',
+                    dataIndex: 'xp_balance',
+                    key: 'xp_balance',
+                    align: 'right',
+                    sorter: (a, b) => a.xp_balance - b.xp_balance,
                 }
             ],
         },
