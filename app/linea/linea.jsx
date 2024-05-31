@@ -191,6 +191,13 @@ const Linea = () => {
                     sorter: (a, b) => a.xp_balance - b.xp_balance,
                 },
                 {
+                    title: 'LXP-L',
+                    dataIndex: 'lxpL',
+                    key: 'lxpL',
+                    align: 'right',
+                    sorter: (a, b) => a.lxpL - b.lxpL,
+                },
+                {
                     title: 'POH',
                     dataIndex: 'isPoh',
                     key: 'isPoh',

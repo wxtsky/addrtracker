@@ -3,7 +3,7 @@ import calculateActivity from "@/services/linea/getActivity";
 import getAccountDetails from "@/services/linea/getAccountDetails";
 import getEthInfo from "@/services/linea/getEthInfo";
 import getPoh from "@/services/linea/getPoh";
-
+import {getLxpL} from "@/services/linea/getLxpL";
 const getLineaData = async (address) => {
     const storedNotes = window.localStorage.getItem('lineaAddressNotes');
     const notes = storedNotes ? JSON.parse(storedNotes) : {};
@@ -20,6 +20,7 @@ const getLineaData = async (address) => {
     const {linea_balance, linea_tx, xp_balance} = await getAccountDetails(address);
     const {mainnet_balance, mainnet_tx} = await getEthInfo(address);
     const isPoh = await getPoh(address);
+    const lxpL = await getLxpL(address);
     return {
         key: address,
         address,
@@ -35,7 +36,8 @@ const getLineaData = async (address) => {
         mainnet_balance,
         mainnet_tx,
         xp_balance,
-        isPoh
+        isPoh,
+        lxpL
     }
 }
 export default getLineaData;
